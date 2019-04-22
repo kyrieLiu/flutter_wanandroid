@@ -5,12 +5,10 @@ class WebViewPage extends StatefulWidget {
   String title;
   String url;
 
-
   WebViewPage({
     Key key,
     @required this.title,
     @required this.url,
-
   }) : super(key: key);
 
   @override
@@ -25,7 +23,6 @@ class WebViewPageState extends State<WebViewPage> {
 
   @override
   void initState() {
-
     print("垃圾${widget.title}+${widget.url}");
 
     flutterWebviewPlugin.onStateChanged.listen((state) {
@@ -45,7 +42,6 @@ class WebViewPageState extends State<WebViewPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return WebviewScaffold(
       url: widget.url,
       appBar: new AppBar(
@@ -53,7 +49,9 @@ class WebViewPageState extends State<WebViewPage> {
         elevation: 0.4,
         title: new Text(widget.title),
         bottom: new PreferredSize(
-          child: isLoad?new LinearProgressIndicator():new Divider(height: 1.0,color: Theme.of(context).primaryColor) ,
+          child: isLoad
+              ? new LinearProgressIndicator()
+              : new Divider(height: 1.0, color: Theme.of(context).primaryColor),
           preferredSize: const Size.fromHeight(1.0),
         ),
       ),
@@ -61,6 +59,5 @@ class WebViewPageState extends State<WebViewPage> {
       withZoom: false,
       withLocalStorage: true,
     );
-
   }
 }

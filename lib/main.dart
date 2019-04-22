@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
 //      routes: <String, WidgetBuilder>{
 //        "app": (BuildContext context) => new App()
 //      },
-      home: new LoginPage(),
+      home: new App(),
     );
   }
 }

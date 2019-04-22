@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:wanandroid_demo/common/application.dart';
+import 'package:wanandroid_demo/common/user.dart';
+import 'package:wanandroid_demo/event/login_event.dart';
+import 'package:wanandroid_demo/login/login_page.dart';
 
 /// Created by liuyin on 2019/3/13 20:47
 /// Description:
@@ -18,7 +22,24 @@ class DrawerPageState extends State<DrawerPage> {
   @override
   void initState() {
     super.initState();
+    registerLoginEvent();
+    if(null!=User.singleton.userName){
+      isLogin = true;
+      userName =User.singleton.userName;
+    }
+  }
 
+  void registerLoginEvent() {
+    Application.eventBus.on<LoginEvent>().listen((event) {
+      changeUI();
+    });
+  }
+
+  changeUI() async {
+    setState(() {
+      isLogin = true;
+      userName = User.singleton.userName;
+    });
   }
 
   @override
@@ -35,8 +56,10 @@ class DrawerPageState extends State<DrawerPage> {
               ),
               onTap: () {
                 if (!isLogin) {
-//                  Navigator.of(context).push(new MaterialPageRoute(
-//                      builder: (context) => new DrawerPage()));
+                  Navigator.of(context)
+                      .push(new MaterialPageRoute(builder: (context) {
+                    return new LoginPage();
+                  }));
                 }
               },
             ),
@@ -44,6 +67,14 @@ class DrawerPageState extends State<DrawerPage> {
               child: CircleAvatar(
                 backgroundImage: AssetImage("images/head.jpg"),
               ),
+              onTap: () {
+                if (!isLogin) {
+                  Navigator.of(context)
+                      .push(new MaterialPageRoute(builder: (context) {
+                    return new LoginPage();
+                  }));
+                }
+              },
             ),
           ),
           ListTile(
@@ -79,9 +110,34 @@ class DrawerPageState extends State<DrawerPage> {
             onTap: () {
               Fluttertoast.showToast(msg: '分享');
             },
-          )
+          ),
+          logoutWidget()
         ],
       ),
     );
+  }
+
+  Widget logoutWidget() {
+    if (User.singleton.userName != null) {
+      return ListTile(
+        title: Text("退出登录", textAlign: TextAlign.left),
+        leading: Icon(
+          Icons.power_settings_new,
+          size: 22,
+        ),
+        onTap: () {
+          User.singleton.clearInfo();
+          setState(() {
+            isLogin = false;
+            userName = "未登录";
+          });
+        },
+      );
+    }
+    else{
+      return SizedBox(
+        height: 0,
+      );
+    }
   }
 }

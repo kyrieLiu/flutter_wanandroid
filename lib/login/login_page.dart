@@ -261,15 +261,13 @@ class _LoginPageState extends State<LoginPage>
     if ((null != username && username.trim().length > 0) &&
         (null != password && password.trim().length > 0)) {
       CommonService().login((UserModel _userModel, Response response) {
-        if (_userModel != null) {
+        if (_userModel != null && _userModel.errorCode == 0) {
           User().saveUserInfo(_userModel, response);
           Application.eventBus.fire(new LoginEvent());
-          if (_userModel.errorCode == 0) {
-            Fluttertoast.showToast(msg: "登录成功");
-            Navigator.of(context).pop();
-          } else {
-            Fluttertoast.showToast(msg: _userModel.errorMsg);
-          }
+          Fluttertoast.showToast(msg: "登录成功");
+          Navigator.of(context).pop();
+        } else {
+          Fluttertoast.showToast(msg: _userModel.errorMsg);
         }
       }, username, password);
     }
@@ -339,7 +337,37 @@ class _LoginPageState extends State<LoginPage>
                                 child: Icon(
                                   FontAwesomeIcons.eye,
                                   size: 15,
-                                  color: Colors.red,
+                                  color: Colors.black,
+                                ),
+                              )),
+                        ),
+                      ),
+                      Container(
+                        width: 250,
+                        height: 1,
+                        color: Colors.grey[400],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            top: 10, bottom: 10, right: 25, left: 25),
+                        child: TextField(
+                          controller: signupConfirmPasswordController,
+                          style: TextStyle(fontSize: 16, color: Colors.black),
+                          obscureText: _obscureTextSignupConfirm,
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              icon: Icon(
+                                FontAwesomeIcons.lock,
+                                color: Colors.black,
+                              ),
+                              hintText: "确认密码",
+                              hintStyle: TextStyle(fontSize: 16),
+                              suffixIcon: GestureDetector(
+                                onTap: _toggleConfirmPassword,
+                                child: Icon(
+                                  FontAwesomeIcons.eye,
+                                  size: 15,
+                                  color: Colors.black,
                                 ),
                               )),
                         ),
@@ -347,12 +375,63 @@ class _LoginPageState extends State<LoginPage>
                     ],
                   ),
                 ),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 340.0),
+                decoration: new BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                ),
+                child: FlatButton(
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          color: const Color(0xFF5394FF),
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(30)),
+                    color: const Color(0xFF5394FF),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 60.0),
+                      child: Text(
+                        "注册",
+                        style: TextStyle(color: Colors.white, fontSize: 18.0),
+                      ),
+                    ),
+                    onPressed: () {
+                      _regist();
+                    }),
               )
             ],
           )
         ],
       ),
     );
+  }
+
+  Future<Null> _regist() async {
+    String userName = signupNameController.text;
+    String password = signupPasswordController.text;
+    String rePassword = signupConfirmPasswordController.text;
+    if ((null != userName && userName.trim().length > 0) &&
+        (null != password && password.trim().length > 0) &&
+        rePassword != null &&
+        rePassword.length > 0) {
+      if (password != rePassword) {
+        Fluttertoast.showToast(msg: "两次密码输入不一致!");
+      } else {
+        CommonService().register((UserModel _userModel) {
+          if (_userModel.errorCode == 0) {
+            Fluttertoast.showToast(msg: "注册成功!");
+          } else {
+            Fluttertoast.showToast(msg: _userModel.errorMsg);
+          }
+        }, userName, password);
+      }
+    } else {
+      Fluttertoast.showToast(
+        msg: "用户名或者密码不能为空",
+      );
+    }
   }
 
   Widget _buildMenuBar(BuildContext context) {
@@ -414,6 +493,12 @@ class _LoginPageState extends State<LoginPage>
   void _toggleSignup() {
     setState(() {
       _obscureTextSignup = !_obscureTextSignup;
+    });
+  }
+
+  void _toggleConfirmPassword(){
+    setState(() {
+      _obscureTextSignupConfirm=!_obscureTextSignupConfirm;
     });
   }
 }

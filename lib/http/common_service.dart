@@ -37,6 +37,20 @@ class CommonService {
     });
   }
 
+  void register(Function callback, String _username, String _password) async {
+    FormData formData = new FormData.from({
+      "username": _username,
+      "password": _password,
+      "repassword": _password
+    });
+    DioManager.singleton.dio
+        .post(Api.USER_REGISTER, data: formData, options: null)
+        .then((response) {
+          print(response.data);
+      callback(UserModel(response.data));
+    });
+  }
+
   Options _getOptions() {
     Map<String, String> map = new Map();
     List<String> cookies = User().cookie;
